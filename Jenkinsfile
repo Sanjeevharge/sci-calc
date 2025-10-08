@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Pull Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/<your-username>/sci-calc.git'
+                git branch: 'main', url: 'https://github.com/Sanjeevharge/sci-calc.git'
             }
         }
 
