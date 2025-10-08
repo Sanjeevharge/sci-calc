@@ -8,9 +8,12 @@ pipeline {
     stages {
         stage('Pull Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/Sanjeevharge/sci-calc.git'
+                git branch: 'main',
+                    credentialsId: 'github-creds',
+                    url: 'https://github.com/Sanjeevharge/sci-calc.git'
             }
-        }
+    }
+
 
         stage('Install Dependencies') {
             steps {
