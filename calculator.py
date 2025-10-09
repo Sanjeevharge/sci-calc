@@ -28,3 +28,5 @@ class Calculator:
     @staticmethod
     def power(x, b):
         return x ** b
+
+#  testing 
