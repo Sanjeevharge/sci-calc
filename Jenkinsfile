@@ -23,7 +23,7 @@ pipeline {
         }
 
         stage('Run Tests') {
-            ssteps {
+            steps {
                 sh '''
                     export PATH=$PATH:~/.local/bin
                     pytest || true
