@@ -1,7 +1,16 @@
 ---
 - hosts: localhost
+  connection: local
   become: yes
+  collections:
+    - community.docker
+
   tasks:
+    - name: Pull Docker image
+      community.docker.docker_image:
+        name:"sanjeevh2772/sci-calc:1.0"
+        source: Pull
+  
     - name: Stop existing container
       community.docker.docker_container:
         name: sci-calc
@@ -13,3 +22,5 @@
         image: sanjeevh2772/sci-calc:1.0
         state: started
         restart_policy: always
+        ports:
+          - "8000:8000"
