@@ -23,8 +23,11 @@ pipeline {
         }
 
         stage('Run Tests') {
-            steps {
-                sh 'pytest || true'
+            ssteps {
+                sh '''
+                    export PATH=$PATH:~/.local/bin
+                    pytest || true
+                '''
             }
         }
 
@@ -50,9 +53,11 @@ pipeline {
 
         stage('Deploy with Ansible') {
             steps {
-                sh "ansible-playbook deploy.yml"
+                // Use your local Ansible installation
+                sh '~/.local/bin/ansible-playbook deploy.yml'
             }
         }
+
     }
 
     post {
