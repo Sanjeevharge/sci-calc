@@ -3,14 +3,13 @@ pipeline {
 
     environment {
         IMAGE_NAME = "sanjeevh2772/sci-calc:1.0"
-        PATH = "$HOME/.local/bin:$PATH"  // ensure user-installed tools are found
     }
 
     stages {
         stage('Pull Repo') {
             steps {
                 git branch: 'main',
-                    credentialsId: 'github-creds',
+                    credentialsId: 'github-token',   // changed to match your working ID
                     url: 'https://github.com/Sanjeevharge/sci-calc.git'
             }
         }
@@ -18,7 +17,9 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
-                    python3 -m pip install --upgrade pip
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
                     pip install -r requirements.txt
                 '''
             }
@@ -26,8 +27,11 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                // Fail pipeline if tests fail
-                sh 'python3 -m pytest'
+                // Run pytest inside the same virtual environment
+                sh '''
+                    . venv/bin/activate
+                    pytest
+                '''
             }
         }
 
@@ -53,7 +57,6 @@ pipeline {
 
         stage('Deploy with Ansible') {
             steps {
-                // Use system-wide Ansible
                 sh 'ansible-playbook deploy.yml'
             }
         }
