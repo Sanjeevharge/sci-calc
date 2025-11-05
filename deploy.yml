@@ -1,9 +1,11 @@
 ---
 - hosts: localhost
   connection: local
+  environment:
+    DOCKER_HOST: unix:///var/run/docker.sock  # 👈 Force use of host Docker socket
 
   tasks:
-    - name: Stop existing container
+    - name: Stop existing container if running
       ansible.builtin.docker_container:
         name: sci-calc
         state: absent
@@ -13,5 +15,6 @@
         name: sci-calc
         image: sanjeevh2772/sci-calc:1.0
         state: started
+        restart_policy: always
         ports:
           - "8000:8000"
