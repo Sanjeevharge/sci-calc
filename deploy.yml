@@ -2,7 +2,7 @@
 - hosts: localhost
   connection: local
   environment:
-    DOCKER_HOST: unix:///var/run/docker.sock  # 👈 Force use of host Docker socket
+    DOCKER_HOST: unix:///var/run/docker.sock  # 
 
   tasks:
     - name: Stop existing container if running
