@@ -3,13 +3,14 @@ pipeline {
 
     environment {
         IMAGE_NAME = "sanjeevh2772/sci-calc:1.0"
+        PIP_USER = "0"  // ensure pip never does --user install
     }
 
     stages {
         stage('Clean Workspace') {
             steps {
                 echo '🧹 Cleaning workspace...'
-                deleteDir()   // ensures a fresh start every build
+                deleteDir()   // ensures a fresh workspace for every build
             }
         }
 
@@ -17,35 +18,39 @@ pipeline {
             steps {
                 echo '📥 Cloning GitHub repository...'
                 git branch: 'main',
-                    credentialsId: 'github-token',   // matches your working credentials
+                    credentialsId: 'github-token',
                     url: 'https://github.com/Sanjeevharge/sci-calc.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                echo '📦 Setting up virtual environment and installing dependencies...'
+                echo '📦 Creating venv and installing dependencies...'
                 sh '''
                     chmod -R 777 .
                     python3 -m venv venv
                     . venv/bin/activate
+                    which python3
                     pip install --upgrade pip
-                    pip install --no-cache-dir -r requirements.txt
+                    PIP_USER=0 pip install --no-cache-dir -r requirements.txt
+                    pip list
                 '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                echo '🧪 Running test cases with pytest...'
+                echo '🧪 Running pytest inside virtualenv...'
                 sh '''
                     . venv/bin/activate
-                    pytest --maxfail=1 --disable-warnings -q --junitxml=pytest-results.xml
+                    which python3
+                    which pytest || echo "pytest not found in PATH"
+                    python3 -m pytest --maxfail=1 --disable-warnings -q --junitxml=pytest-results.xml
                 '''
             }
             post {
                 always {
-                    junit 'pytest-results.xml'  // publish test report in Jenkins
+                    junit 'pytest-results.xml'
                 }
             }
         }
@@ -75,7 +80,7 @@ pipeline {
 
         stage('Deploy with Ansible') {
             steps {
-                echo '⚙️ Deploying application using Ansible...'
+                echo '⚙️ Deploying with Ansible...'
                 sh 'ansible-playbook deploy.yml'
             }
         }
